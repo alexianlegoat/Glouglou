@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glouglou - Jeu de Soirée</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="manifest" href="manifest.json">
+    
+</head>
+<body>
+
+    <div id="page-accueil" class="page active">
+        <img src="logo_glouglou.png" alt="Logo Glouglou" id="logo-accueil">
+        <h1 id="app-title">Glouglou</h1>
+        <p id="catchphrase">Prêt à lever le coude ?</p>
+        <p id="tagline">Le jeu ultime pour pimenter vos soirées entre amis.</p>
+        <button id="btnPret" class="btn-accueil">Prêt</button>
+    </div>
+
+    <div id="page-joueurs" class="page">
+        <button id="btnRetourJoueurs" class="btn-retour"></button>
+        
+        <img src="logo_glouglou.png" alt="Logo Glouglou" id="logo-principal">
+        <h2>Qui joue ce soir ?</h2>
+        <div class="input-zone">
+            <input type="text" id="inputNom" placeholder="Nom du joueur...">
+            <span id="btnAjouterInline" class="add-button-inline">➕</span>
+        </div>
+        <ul id="listeDesJoueurs"></ul>
+        <button id="btnSuivant" class="btn-principal">Suivant</button>
+    </div>
+
+    <div id="page-packs" class="page">
+        <button id="btnRetourPacks" class="btn-retour"></button>
+        
+        <img src="logo_glouglou.png" alt="Logo Glouglou" id="logo-principal">
+        <h2>Choisissez votre mode</h2>
+        <div class="pack-grid">
+            <input type="radio" id="pack-debut" name="pack" value="debutSoiree">
+            <label for="pack-debut" id="label-debut">
+                <span class="pack-title">Début de soirée 🎉</span>
+                <span class="pack-description">Des questions légères pour briser la glace.</span>
+            </label>
+            <input type="radio" id="pack-problemes" name="pack" value="problemes">
+            <label for="pack-problemes" id="label-problemes">
+                <span class="pack-title">Problèmes 😬</span>
+                <span class="pack-description">Des défis embarrassants qui créent des souvenirs.</span>
+            </label>
+            <input type="radio" id="pack-chauffe" name="pack" value="caChauffe">
+            <label for="pack-chauffe" id="label-chauffe">
+                <span class="pack-title">Ça chauffe 🔥</span>
+                <span class="pack-description">Révélez vos secrets les plus intimes... ou pas.</span>
+            </label>
+            <input type="radio" id="pack-glouglou" name="pack" value="glouglou">
+            <label for="pack-glouglou" id="label-glouglou">
+                <span class="pack-title">Glouglou 🍻</span>
+                <span class="pack-description">Des gages qui vous feront boire un coup.</span>
+            </label>
+        </div>
+        <button id="btnCommencerJeu" class="btn-principal">Commencer la partie !</button>
+    </div>
+
+    <div id="alertModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h4>Attention</h4>
+            <p>Veuillez ajouter au moins un joueur avant de continuer !</p>
+            <div class="modal-buttons">
+                <button id="modalBtnOK" class="modal-btn modal-btn-ok">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+    "name": "Glouglou",
+    "short_name": "Glouglou",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#0020C2",
+    "theme_color": "#0020C2",
+    "orientation": "portrait",
+    "description": "Le jeu ultime pour pimenter vos soirées entre amis.",
+    "icons": [
+        {
+            "src": "logo_glouglou.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "logo_glouglou.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

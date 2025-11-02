@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Partie - Glouglou</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        /* Bloque le scroll sur la racine */
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0020C2 0%, #432b8f 50%, #CC00CB 100%);
+            background-size: 400% 400%;
+            animation: floatBackground 15s ease infinite;
+            background-attachment: fixed;
+            color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .container {
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Aligner en haut */
+        }
+
+        /* Logo plus petit et plus haut */
+        #logo-principal {
+            display: block;
+            margin: 0 auto 10px auto;
+            height: 60px;
+            width: auto;
+        }
+
+        /* Titres */
+        h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+        h3 { display: none; } /* On cache le H3 "Joueurs dans la partie" */
+
+        /* Zone de jeu plus grande */
+        #zone-de-jeu {
+            min-height: 200px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        #nom-joueur-actuel {
+            font-size: 1.7em;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        #action-de-jeu {
+            font-size: 1.2em;
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+
+        /* Bouton "Tour Suivant" (violet) */
+        .btn-principal {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1em;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            background-color: #8A2BE2; /* Violet */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            transition: background-color 0.2s;
+        }
+        .btn-principal:hover { background-color: #7B1FA2; /* Violet plus foncé */ }
+
+        #joueurs-en-jeu { display: none; } /* On cache la liste des joueurs en bas */
+
+        /* Conteneur pour les boutons du bas */
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 20px;
+            width: 100%;
+        }
+
+        /* Style pour les boutons de contrôle */
+        .btn-control {
+            flex-grow: 1;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn-control:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: scale(1.03);
+        }
+        #btnChangePack {
+            background-color: rgba(220, 53, 69, 0.3);
+            border-color: rgba(220, 53, 69, 0.5);
+        }
+         #btnChangePack:hover {
+            background-color: rgba(220, 53, 69, 0.5);
+        }
+
+        /* Écran de fin */
+        #ecran-fin {
+            text-align: center;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            z-index: 5; /* Au cas où */
+        }
+        #ecran-fin h2 { font-size: 2.5em; font-weight: 700; color: #dc3545; margin-bottom: 10px; }
+        #ecran-fin p { font-size: 1.1em; color: #e0e0e0; margin-bottom: 30px; }
+        #ecran-fin .btn-principal { background-color: #28a745; }
+        #ecran-fin .btn-principal:hover { background-color: #218838; }
+
+        /* ======== Style de la Modale ======== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background-color: rgba(40, 40, 70, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 25px 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h4 {
+            color: white;
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .modal-content p {
+            color: #e0e0e0;
+            font-size: 1em;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+        .modal-btn {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .modal-btn:active { transform: scale(0.98); }
+        .modal-btn-yes { background-color: #dc3545; color: white; }
+        .modal-btn-yes:hover { background-color: #c82333; }
+        .modal-btn-no { background-color: #6c757d; color: white; }
+        .modal-btn-no:hover { background-color: #5a6268; }
+        /* ==================================== */
+
+        /* Animation du fond */
+        @keyframes floatBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+    </head>
+<body>
+
+    <div class="container">
+
+        <div id="jeu-container">
+            <img src="logo_glouglou.png" alt="Logo Glouglou" id="logo-principal">
+            <h2 id="titre-pack">La partie est lancée !</h2>
+            <div id="zone-de-jeu">
+                <div id="nom-joueur-actuel">Chargement...</div>
+                <div id="action-de-jeu">...</div>
+            </div>
+            <button id="btnTourSuivant" class="btn-principal">
+                Tour Suivant
+            </button>
+            <div class="game-controls">
+                <button id="btnManagePlayers" class="btn-control">Gérer Joueurs</button>
+                <button id="btnChangePack" class="btn-control">Changer de Mode</button>
+            </div>
+        </div>
+
+        <div id="ecran-fin">
+            <h2>Game Over</h2>
+            <p>Vous avez vu toutes les questions de ce pack !</p>
+            <button id="btnRecommencer" class="btn-principal">Recommencer</button>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h4>Quitter la partie ?</h4>
+            <p>Êtes-vous sûr de vouloir quitter la partie en cours et changer de mode ?</p>
+            <div class="modal-buttons">
+                <button id="modalBtnYes" class="modal-btn modal-btn-yes">Oui</button>
+                <button id="modalBtnNo" class="modal-btn modal-btn-no">Non</button>
+            </div>
+        </div>
+    </div>
+    <script src="packs.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- SÉLECTIONS ---
+            const ulListeJoueurs = document.getElementById('joueurs-en-jeu');
+            const divNomJoueur = document.getElementById('nom-joueur-actuel');
+            const divActionJeu = document.getElementById('action-de-jeu');
+            const btnTourSuivant = document.getElementById('btnTourSuivant');
+            const titrePack = document.getElementById('titre-pack');
+            const jeuContainer = document.getElementById('jeu-container');
+            const ecranFin = document.getElementById('ecran-fin');
+            const btnRecommencer = document.getElementById('btnRecommencer');
+            const btnManagePlayers = document.getElementById('btnManagePlayers');
+            const btnChangePack = document.getElementById('btnChangePack');
+            const confirmModal = document.getElementById('confirmModal');
+            const modalBtnYes = document.getElementById('modalBtnYes');
+            const modalBtnNo = document.getElementById('modalBtnNo');
+
+            // --- L'objet packsDeQuestions est maintenant chargé depuis packs.js ---
+            // (on n'a plus besoin de le définir ici)
+
+            // --- VARIABLES GLOBALES ---
+            let questionsDisponibles = [];
+            let packActif = "";
+            let joueursEnJeu = [];
+            let tourActuel = 0;
+            
+            // --- FONCTION RECHARGER QUESTIONS ---
+            function rechargerQuestions() { 
+                if (packsDeQuestions[packActif]) {
+                    questionsDisponibles = [...packsDeQuestions[packActif]]; 
+                } else {
+                    console.error("Le pack " + packActif + " n'existe pas dans packs.js");
+                    questionsDisponibles = []; // Vide pour éviter les erreurs
+                }
+            }
+
+            // --- FONCTIONS DE JEU ---
+            function chargerJeu() {
+                const joueursSauvegardes = localStorage.getItem('listeDesJoueurs');
+                packActif = localStorage.getItem('packDeJeu');
+                
+                // On vérifie aussi si packsDeQuestions a bien été chargé
+                if (!joueursSauvegardes || !packActif || typeof packsDeQuestions === 'undefined' || !packsDeQuestions[packActif]) {
+                    afficherErreur("Données de jeu non valides ou pack de questions manquant. Retournez à l'accueil.");
+                    if(btnTourSuivant) btnTourSuivant.style.display = 'none';
+                    if(btnManagePlayers) btnManagePlayers.style.display = 'none';
+                    if(btnChangePack) btnChangePack.style.display = 'none';
+                    return;
+                }
+                
+                joueursEnJeu = JSON.parse(joueursSauvegardes);
+
+                if(packActif === 'debutSoiree') titrePack.textContent = "Mode : Début de Soirée 🎉";
+                if(packActif === 'caChauffe') titrePack.textContent = "Mode : Ça Chauffe 🔥";
+                if(packActif === 'problemes') titrePack.textContent = "Mode : Problèmes 😬";
+                if(packActif === 'glouglou') titrePack.textContent = "Mode : Glouglou 🍻";
+                rechargerQuestions();
+                demarrerNouveauTour();
+            }
+
+            function demarrerNouveauTour() {
+                if (questionsDisponibles.length === 0) { terminerPartie(); return; }
+                const nomDuJoueur = joueursEnJeu[tourActuel];
+                divNomJoueur.textContent = nomDuJoueur;
+                afficherQuestionAleatoire();
+            }
+
+            function afficherQuestionAleatoire() {
+                if (questionsDisponibles.length === 0) {
+                    divActionJeu.textContent = "Plus de questions dans ce pack !";
+                    return;
+                }
+                const indexAleatoire = Math.floor(Math.random() * questionsDisponibles.length);
+                const questionChoisie = questionsDisponibles.splice(indexAleatoire, 1)[0];
+                divActionJeu.textContent = questionChoisie;
+            }
+            function passerAuTourSuivant() {
+                tourActuel = (tourActuel + 1) % joueursEnJeu.length; 
+                demarrerNouveauTour();
+            }
+            function terminerPartie() {
+                jeuContainer.style.display = 'none';
+                ecranFin.style.display = 'block';
+            }
+            function afficherErreur(message) {
+                titrePack.textContent = "Erreur";
+                divNomJoueur.textContent = "";
+                divActionJeu.textContent = message;
+            }
+
+            // --- FONCTIONS MODALE ---
+             function showModal(show) {
+                if (show) {
+                    confirmModal.style.display = 'flex';
+                    requestAnimationFrame(() => { confirmModal.classList.add('visible'); });
+                } else {
+                    confirmModal.classList.remove('visible');
+                    setTimeout(() => { confirmModal.style.display = 'none'; }, 300);
+                }
+            }
+
+            // --- ÉCOUTEURS D'ÉVÉNEMENTS ---
+            chargerJeu();
+            if(btnTourSuivant) btnTourSuivant.addEventListener('click', passerAuTourSuivant);
+            if(btnRecommencer) btnRecommencer.addEventListener('click', () => { window.location.href = 'index.html'; });
+
+            if (btnChangePack) {
+                btnChangePack.addEventListener('click', () => { showModal(true); });
+            }
+            if (modalBtnYes) {
+                modalBtnYes.addEventListener('click', () => {
+                    showModal(false);
+                    window.location.href = 'index.html#packs';
+                });
+            }
+            if (modalBtnNo) {
+                modalBtnNo.addEventListener('click', () => { showModal(false); });
+            }
+            if (btnManagePlayers) {
+                btnManagePlayers.addEventListener('click', () => {
+                    alert("Fonctionnalité 'Gérer Joueurs' en cours de développement !");
+                    console.log("Joueurs actuels:", joueursEnJeu);
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
